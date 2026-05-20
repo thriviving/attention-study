@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Task Questionnaire</title>
+
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: #d9e1ea;
+      --accent: #1d4f91;
+      --navy: #0f172a;
+      --lavender: #f4f0ff;
+      --lavender-border: #ddd6fe;
+      --lavender-text: #4c1d95;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, #e8f0fb 0, transparent 34%),
+        radial-gradient(circle at bottom right, #f4f0ff 0, transparent 32%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, #0f172a, #1d4f91);
+      color: white;
+      padding: 34px 28px;
+    }
+
+    .topbar-inner {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      color: #e8f0fb;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.2;
+      font-weight: 780;
+      letter-spacing: -0.015em;
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      max-width: 780px;
+      color: #dbe7ff;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 26px auto 46px;
+      padding: 0 20px;
+    }
+
+    .note {
+      background: var(--lavender);
+      border: 1px solid var(--lavender-border);
+      color: var(--lavender-text);
+      border-radius: 18px;
+      padding: 18px 20px;
+      line-height: 1.7;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .section h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .section-desc {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .field {
+      margin-bottom: 22px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-label {
+      display: block;
+      font-weight: 750;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: white;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.6;
+    }
+
+    .likert-question {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px 24px;
+      background: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .likert-statement {
+      margin: 0 0 24px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .likert-grid {
+      display: grid;
+      grid-template-columns: 170px repeat(5, 1fr) 150px;
+      gap: 10px;
+      align-items: center;
+      text-align: center;
+    }
+
+    .likert-number {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .scale-end {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .likert-radio {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .likert-radio input {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .empty-cell {
+      height: 1px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 22px;
+      background: var(--accent);
+      color: white;
+      font-size: 15px;
+      font-weight: 780;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      opacity: 0.96;
+    }
+
+    @media (max-width: 760px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .likert-question {
+        padding: 18px;
+      }
+
+      .likert-grid {
+        grid-template-columns: repeat(5, 1fr);
+        row-gap: 10px;
+      }
+
+      .empty-cell {
+        display: none;
+      }
+
+      .scale-end {
+        grid-column: span 5;
+        font-size: 13px;
+      }
+
+      .scale-end.left {
+        text-align: left;
+      }
+
+      .scale-end.right {
+        text-align: right;
+      }
+
+      .actions {
+        align-items: stretch;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="eyebrow">Final Questionnaire</div>
+    <h1>Tell us about your task experience</h1>
+    <p class="subtitle">
+      Please answer the following questions based on the three tasks you just completed.
+      Use the scale from 1 to 5, where 1 means Strongly Disagree and 5 means Strongly Agree.
+    </p>
+  </div>
+</header>
+
+<main>
+  <div class="note">
+    Your responses will be combined with the task interaction data already stored during the experiment.
+    Please answer honestly based on your actual experience.
+  </div>
+
+  <form id="questionnaireForm">
+
+    <section class="section">
+      <h2>Section 0: Participant Background</h2>
+      <p class="section-desc">This helps interpret the results across different participant backgrounds.</p>
+
+      <div class="field">
+        <label class="field-label" for="ageRange">Age range</label>
+        <select id="ageRange" name="ageRange" required>
+          <option value="">Select an option</option>
+          <option>18–24</option>
+          <option>25–34</option>
+          <option>35–44</option>
+          <option>45+</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="role">Current role / field</label>
+        <select id="role" name="role" required>
+          <option value="">Select an option</option>
+          <option>Software Engineering</option>
+          <option>QA / Testing</option>
+          <option>Business Analysis / Product</option>
+          <option>Data / Analytics</option>
+          <option>DevOps / IT Operations</option>
+          <option>Support / Customer Operations</option>
+          <option>Student</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="experience">Years of experience working with digital workplace systems</label>
+        <select id="experience" name="experience" required>
+          <option value="">Select an option</option>
+          <option>Less than 1 year</option>
+          <option>1–2 years</option>
+          <option>3–5 years</option>
+          <option>6–10 years</option>
+          <option>More than 10 years</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="familiarity">How familiar are you with dashboards, ticketing tools, workflow tools, or similar systems?</label>
+        <select id="familiarity" name="familiarity" required>
+          <option value="">Select an option</option>
+          <option>Not familiar</option>
+          <option>Slightly familiar</option>
+          <option>Moderately familiar</option>
+          <option>Very familiar</option>
+          <option>Extremely familiar</option>
+        </select>
+      </div>
+    </section>
+
+    <div id="likertContainer"></div>
+
+    <section class="section">
+      <h2>Open-ended Feedback</h2>
+      <p class="section-desc">This is optional.</p>
+
+      <div class="field">
+        <label class="field-label" for="comments">Additional comments about your experience during the tasks</label>
+        <textarea id="comments" name="comments" placeholder="Type your comments here..."></textarea>
+      </div>
+    </section>
+
+    <div class="actions">
+      <div class="small-note">
+        After submission, your responses and locally stored task metrics will be saved in the browser temporarily for testing.
+        Google Form submission will be connected in the next step.
+      </div>
+
+      <button class="btn" type="submit">Submit Questionnaire</button>
+    </div>
+
+  </form>
+</main>
+
+<script>
+  const sections = [
+    {
+      title: "Section A: Perceived Focus",
+      description: "These questions ask about your ability to stay focused during the tasks.",
+      items: [
+        { id: "focus_1", text: "I was able to maintain my focus while working through the tasks." },
+        { id: "focus_2", text: "I stayed mentally engaged when reviewing the information presented." },
+        { id: "focus_3", text: "I was able to stay on track without losing attention frequently." },
+        { id: "focus_4_reverse", text: "I found it difficult to maintain continuous attention throughout the tasks." }
+      ]
+    },
+    {
+      title: "Section B: Cognitive Load",
+      description: "These questions ask about the mental effort required during the tasks.",
+      items: [
+        { id: "load_1", text: "The tasks required careful thinking and attention." },
+        { id: "load_2", text: "I had to process a large amount of information at once." },
+        { id: "load_3_reverse", text: "I was able to understand the information without feeling overloaded." },
+        { id: "load_4", text: "The way information was presented made the tasks feel mentally demanding." }
+      ]
+    },
+    {
+      title: "Section C: Interface Experience",
+      description: "These questions ask about how the interface supported or affected your work.",
+      items: [
+        { id: "interface_1", text: "Important information was easy to identify during the tasks." },
+        { id: "interface_2", text: "The interface helped me stay focused on the main task." },
+        { id: "interface_3_reverse", text: "Some interface elements distracted me from completing the tasks efficiently." },
+        { id: "interface_4", text: "The overall layout supported my ability to work through the tasks smoothly." }
+      ]
+    },
+    {
+      title: "Section D: Task Confidence & Clarity",
+      description: "These questions ask about confidence, clarity, and certainty during the tasks.",
+      items: [
+        { id: "clarity_1", text: "I felt confident in the answers I submitted." },
+        { id: "clarity_2", text: "I was able to understand what was expected in each task." },
+        { id: "clarity_3", text: "I was able to identify relevant information without excessive confusion." },
+        { id: "clarity_4_reverse", text: "I often felt uncertain about whether I was focusing on the correct information." }
+      ]
+    }
+  ];
+
+  const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeYxmKmbcjDaVC5242Omkc0Q88csCvvFlYFFTVOPEdsS_EWAg/formResponse";
+
+  const FORM_FIELDS = {
+    participantId: "entry.1686582460",
+    condition: "entry.2126879055",
+    experimentStartedAt: "entry.1542557624",
+    questionnaireSubmittedAt: "entry.1195015463",
+
+    ageRange: "entry.945549187",
+    role: "entry.281928273",
+    experience: "entry.525167589",
+    familiarity: "entry.581712666",
+
+    focus_1: "entry.1446912048",
+    focus_2: "entry.1295582475",
+    focus_3: "entry.919956977",
+    focus_4_reverse: "entry.2141913808",
+
+    load_1: "entry.1041811905",
+    load_2: "entry.1331962209",
+    load_3_reverse: "entry.286599731",
+    load_4: "entry.1363019940",
+
+    interface_1: "entry.550218341",
+    interface_2: "entry.1770827394",
+    interface_3_reverse: "entry.1369505073",
+    interface_4: "entry.1329930588",
+
+    clarity_1: "entry.98445684",
+    clarity_2: "entry.645053803",
+    clarity_3: "entry.746971680",
+    clarity_4_reverse: "entry.6749745",
+
+    comments: "entry.214571196",
+    task1Metrics: "entry.1877734083",
+    task2Metrics: "entry.278941053",
+    task3Metrics: "entry.1784111969"
+  };
+
+  const likertContainer = document.getElementById("likertContainer");
+
+  function createLikertQuestion(item) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "likert-question";
+
+    const statement = document.createElement("p");
+    statement.className = "likert-statement";
+    statement.textContent = item.text;
+
+    const grid = document.createElement("div");
+    grid.className = "likert-grid";
+
+    grid.innerHTML = `
+      <div class="empty-cell"></div>
+      <div class="likert-number">1</div>
+      <div class="likert-number">2</div>
+      <div class="likert-number">3</div>
+      <div class="likert-number">4</div>
+      <div class="likert-number">5</div>
+      <div class="empty-cell"></div>
+
+      <div class="scale-end left">Strongly disagree</div>
+      ${[1, 2, 3, 4, 5].map(value => `
+        <label class="likert-radio">
+          <input type="radio" name="${item.id}" value="${value}" required />
+        </label>
+      `).join("")}
+      <div class="scale-end right">Strongly agree</div>
+    `;
+
+    wrapper.appendChild(statement);
+    wrapper.appendChild(grid);
+
+    return wrapper;
+  }
+
+  sections.forEach(section => {
+    const sectionElement = document.createElement("section");
+    sectionElement.className = "section";
+
+    const title = document.createElement("h2");
+    title.textContent = section.title;
+
+    const desc = document.createElement("p");
+    desc.className = "section-desc";
+    desc.textContent = section.description;
+
+    sectionElement.appendChild(title);
+    sectionElement.appendChild(desc);
+
+    section.items.forEach(item => {
+      sectionElement.appendChild(createLikertQuestion(item));
+    });
+
+    likertContainer.appendChild(sectionElement);
+  });
+
+  function getTaskMetrics(condition) {
+    const suffix = condition === "focus" ? "focus" : "distraction";
+
+    return {
+      task1: localStorage.getItem(`task1_${suffix}_metrics`) || "",
+      task2: localStorage.getItem(`task2_${suffix}_metrics`) || "",
+      task3: localStorage.getItem(`task3_${suffix}_metrics`) || ""
+    };
+  }
+
+  document.getElementById("questionnaireForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const condition = localStorage.getItem("condition") || "unknown";
+    const submittedAt = new Date().toISOString();
+    const taskMetrics = getTaskMetrics(condition);
+
+    const params = new URLSearchParams();
+
+    params.append(FORM_FIELDS.participantId, localStorage.getItem("participant_id") || "");
+    params.append(FORM_FIELDS.condition, condition);
+    params.append(FORM_FIELDS.experimentStartedAt, localStorage.getItem("experiment_started_at") || "");
+    params.append(FORM_FIELDS.questionnaireSubmittedAt, submittedAt);
+
+    params.append(FORM_FIELDS.ageRange, document.getElementById("ageRange").value);
+    params.append(FORM_FIELDS.role, document.getElementById("role").value);
+    params.append(FORM_FIELDS.experience, document.getElementById("experience").value);
+    const familiarityMap = {
+  "Not familiar": "1",
+  "Slightly familiar": "2",
+  "Moderately familiar": "3",
+  "Very familiar": "4",
+  "Extremely familiar": "5"
+};
+
+params.append(
+  FORM_FIELDS.familiarity,
+  familiarityMap[document.getElementById("familiarity").value] || ""
+);
+
+    sections.forEach(section => {
+      section.items.forEach(item => {
+        const selected = document.querySelector(`input[name="${item.id}"]:checked`);
+        params.append(FORM_FIELDS[item.id], selected ? selected.value : "");
+      });
+    });
+
+    params.append(FORM_FIELDS.comments, document.getElementById("comments").value.trim());
+    params.append(FORM_FIELDS.task1Metrics, taskMetrics.task1);
+    params.append(FORM_FIELDS.task2Metrics, taskMetrics.task2);
+    params.append(FORM_FIELDS.task3Metrics, taskMetrics.task3);
+
+    const localBackup = {
+      participantId: localStorage.getItem("participant_id") || "",
+      condition,
+      experimentStartedAt: localStorage.getItem("experiment_started_at") || "",
+      questionnaireSubmittedAt: submittedAt,
+      ageRange: document.getElementById("ageRange").value,
+      role: document.getElementById("role").value,
+      experience: document.getElementById("experience").value,
+      familiarity: document.getElementById("familiarity").value,
+      comments: document.getElementById("comments").value.trim(),
+      taskMetrics
+    };
+
+    localStorage.setItem("final_questionnaire_response", JSON.stringify(localBackup));
+    localStorage.setItem("google_form_submission_payload", params.toString());
+
+    const googleForm = document.createElement("form");
+googleForm.action = GOOGLE_FORM_URL;
+googleForm.method = "POST";
+googleForm.style.display = "none";
+
+for (const [key, value] of params.entries()) {
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = key;
+  input.value = value;
+  googleForm.appendChild(input);
+}
+
+const iframe = document.createElement("iframe");
+iframe.name = "hidden_google_form_iframe";
+iframe.style.display = "none";
+document.body.appendChild(iframe);
+
+googleForm.target = "hidden_google_form_iframe";
+
+document.body.appendChild(googleForm);
+googleForm.submit();
+
+setTimeout(() => {
+  window.location.href = "thankyou.html";
+}, 2000);
+  });
+</script>
+
+</body>
+</html>

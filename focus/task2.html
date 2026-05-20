@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task 2 - Promotion Logic Investigation</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --panel-soft: #fafcff;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: #d9e1ea;
+      --accent: #1d4f91;
+      --navy: #0f172a;
+      --danger: #b42318;
+      --warning: #b54708;
+      --success: #157347;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 24px;
+      background: var(--navy);
+      color: white;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .brand .title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .brand .subtitle {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .timer,
+    .progress-chip {
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.08);
+      padding: 10px 14px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .page {
+      width: min(1100px, calc(100% - 32px));
+      margin: 24px auto 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fcfdff;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .card-subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .card-body {
+      padding: 18px 20px 20px;
+    }
+
+    .priority-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #fff7ed;
+      color: var(--warning);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .ticket-meta {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .meta-box {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-soft);
+    }
+
+    .meta-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .meta-value {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .ticket-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .ticket-block {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 15px 16px;
+      background: #fff;
+    }
+
+    .ticket-block.full {
+      grid-column: 1 / -1;
+    }
+
+    .block-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .block-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .block-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.95fr;
+      gap: 18px;
+    }
+
+    .source-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .source-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 15px 16px;
+      background: #fff;
+    }
+
+    .source-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .source-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .source-chip {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .chip-info { background: #e8f0fb; color: var(--accent); }
+    .chip-warning { background: #fff7ed; color: var(--warning); }
+    .chip-success { background: #ecfdf3; color: var(--success); }
+
+    .mini-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 12px 0 6px;
+      font-weight: 800;
+    }
+
+    .source-card p,
+    .source-card li,
+    .side-note p,
+    .side-note li {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .source-card ul,
+    .side-note ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .timeline-step {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fbfcfe;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .timeline-step strong {
+      display: inline-block;
+      min-width: 118px;
+      color: var(--text);
+    }
+
+    .side-note {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fbfcfe;
+      margin-bottom: 14px;
+    }
+
+    .side-note h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .questions-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .question {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
+    }
+
+    .question-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .question-hint {
+      margin: -4px 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .option:hover {
+      border-color: #b8c8da;
+      background: #fbfdff;
+    }
+
+    .option input {
+      margin-top: 2px;
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 18px 20px 22px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+    }
+
+    .helper-nav {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .helper-nav a {
+      text-decoration: none;
+      background: var(--navy);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+    }
+
+    @media (max-width: 960px) {
+      .ticket-meta {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ticket-grid,
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .page {
+        width: min(1100px, calc(100% - 18px));
+        margin-top: 16px;
+      }
+
+      .ticket-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-right {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="title">Operations Review Workspace</div>
+    <div class="subtitle">Task 2 · Promotion Logic Investigation</div>
+  </div>
+  <div class="topbar-right">
+    <div class="progress-chip" id="progressChip">0 / 4 answered</div>
+    <div class="timer" id="timer">Time remaining: 03:30</div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="card track-section" id="ticket" data-section="ticket">
+    <div class="card-header">
+      <h1 class="card-title">Customer Experience Escalation Ticket</h1>
+      <div class="card-subtitle">Review this newly reported promotion behaviour issue and determine the most likely explanation using the attached system evidence.</div>
+    </div>
+    <div class="card-body">
+      <div class="priority-pill">P2 - High · Customer Experience Issue · Checkout Impact</div>
+
+      <div class="ticket-meta">
+        <div class="meta-box">
+          <div class="meta-label">Ticket ID</div>
+          <div class="meta-value">CX-2841</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Source</div>
+          <div class="meta-value">Customer Support (L2)</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Reported Time</div>
+          <div class="meta-value">02:15 PM</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Affected Area</div>
+          <div class="meta-value">Checkout / Promotions</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Environment</div>
+          <div class="meta-value">Production · Mobile & Web</div>
+        </div>
+      </div>
+
+      <div class="ticket-grid">
+        <div class="ticket-block full">
+          <div class="block-label">Summary</div>
+          <p class="block-text">Users report that discount codes initially appear successfully applied but are later removed during checkout validation.</p>
+        </div>
+
+        <div class="ticket-block full">
+          <div class="block-label">Description</div>
+          <p class="block-text">Customer support escalated a newly reported issue affecting multiple users during checkout. Users apply a promotional code and initially receive a success confirmation. Shortly afterwards the discount is removed from the applied list, reappears in the available list, and the final payable amount remains unchanged. The issue has been reproduced across multiple vendors.</p>
+        </div>
+
+        <div class="ticket-block">
+          <div class="block-label">Observed Behaviour</div>
+          <ul class="block-list">
+            <li>Green success ribbon appears immediately after code entry</li>
+            <li>Applied code is later removed from the active promotion area</li>
+            <li>The same code returns to the available promotion list</li>
+          </ul>
+        </div>
+
+        <div class="ticket-block">
+          <div class="block-label">Impact</div>
+          <p class="block-text">Users experience confusion during checkout and may abandon the purchase flow due to inconsistent promotion feedback.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card track-section" id="evidence" data-section="evidence">
+    <div class="card-header">
+      <h2 class="card-title">Attached System Evidence</h2>
+      <div class="card-subtitle">Use the source evidence, timeline, and investigation notes together. Some signals may explain the sequence, while others explain the underlying cause.</div>
+    </div>
+    <div class="card-body">
+      <div class="split-grid">
+        <div class="source-stack">
+          <div class="source-card">
+            <div class="source-header">
+              <div class="source-title">Source A · User Flow</div>
+              <span class="source-chip chip-info">User Flow</span>
+            </div>
+            <p>User applies discount code → success shown → code moves to applied list → later rejected → code returns to available list → final amount unchanged.</p>
+          </div>
+
+          <div class="source-card">
+            <div class="source-header">
+              <div class="source-title">Source B · Processing Flow</div>
+              <span class="source-chip chip-warning">Processing</span>
+            </div>
+            <div class="mini-label">Validation Stages</div>
+            <ul>
+              <li>Availability check</li>
+              <li>Condition check</li>
+              <li>Final application decision</li>
+            </ul>
+          </div>
+
+          <div class="source-card">
+            <div class="source-header">
+              <div class="source-title">Source C · Business Rules</div>
+              <span class="source-chip chip-success">Rules</span>
+            </div>
+            <div class="mini-label">Promotion Requirements</div>
+            <ul>
+              <li>Vendor eligibility</li>
+              <li>Minimum order value</li>
+              <li>Item applicability</li>
+              <li>Campaign conditions</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="side-note">
+            <h3>Processing Timeline</h3>
+            <div class="timeline">
+              <div class="timeline-step"><strong>Apply Code</strong> User enters a promotional code.</div>
+              <div class="timeline-step"><strong>Availability Check</strong> Code validity is confirmed.</div>
+              <div class="timeline-step"><strong>Success Ribbon</strong> Green success state is shown to the user.</div>
+              <div class="timeline-step"><strong>Condition Validation</strong> Order conditions are evaluated afterwards.</div>
+              <div class="timeline-step"><strong>Warning Ribbon</strong> User is told the discount cannot be applied.</div>
+              <div class="timeline-step"><strong>State Reset</strong> Code is removed from applied list and returns to available list.</div>
+            </div>
+          </div>
+
+          <div class="side-note">
+            <h3>Investigation Notes</h3>
+            <ul>
+              <li>Issue consistently reproduced when order amount is below a hidden minimum threshold</li>
+              <li>Green success ribbon appears before final conditions are evaluated</li>
+              <li>No payment or UI rendering failures were observed during reproduction</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card track-section" id="questions" data-section="questions">
+    <div class="card-header">
+      <h2 class="card-title">Questions</h2>
+      <div class="card-subtitle">Choose the best answer based only on the ticket details and attached evidence shown above.</div>
+    </div>
+    <div class="card-body">
+      <div class="questions-wrap">
+        <div class="question">
+          <p class="question-title">1. What is happening in this scenario?</p>
+          <p class="question-hint">Choose the option that best reflects the underlying cause rather than only the visible symptom.</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="q1" value="The system randomly removes discount codes" /> The system randomly removes discount codes</label>
+            <label class="option"><input type="radio" name="q1" value="The discount is first accepted and later rejected after validation" /> The discount is first accepted and later rejected after validation</label>
+            <label class="option"><input type="radio" name="q1" value="The checkout page is not refreshing properly" /> The checkout page is not refreshing properly</label>
+            <label class="option"><input type="radio" name="q1" value="The promotion code expires during checkout" /> The promotion code expires during checkout</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <p class="question-title">2. Which part of the process causes the discount to be removed?</p>
+          <p class="question-hint">Look for the source that best explains both the sequence of events and why the final outcome changes.</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="q2" value="Availability check" /> Availability check</label>
+            <label class="option"><input type="radio" name="q2" value="Condition validation step" /> Condition validation step</label>
+            <label class="option"><input type="radio" name="q2" value="Payment processing" /> Payment processing</label>
+            <label class="option"><input type="radio" name="q2" value="Vendor synchronization" /> Vendor synchronization</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <p class="question-title">3. Which statement is correct based on the evidence?</p>
+          <p class="question-hint">Look for the statement that goes beyond what the system flow and rules actually confirm.</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="q3" value="Passing the first check guarantees the discount will apply" /> Passing the first check guarantees the discount will apply</label>
+            <label class="option"><input type="radio" name="q3" value="The discount can return to the available list if validation fails" /> The discount can return to the available list if validation fails</label>
+            <label class="option"><input type="radio" name="q3" value="The issue is caused by payment gateway delays" /> The issue is caused by payment gateway delays</label>
+            <label class="option"><input type="radio" name="q3" value="Users are entering invalid discount codes" /> Users are entering invalid discount codes</label>
+          </div>
+        </div>
+
+        <div class="question">
+          <p class="question-title">4. Why are users getting confused?</p>
+          <p class="question-hint">Identify the primary UX problem rather than a secondary effect of the process.</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="q4" value="The success message appears before all validations are completed" /> The success message appears before all validations are completed</label>
+            <label class="option"><input type="radio" name="q4" value="The system takes too long to load promotions" /> The system takes too long to load promotions</label>
+            <label class="option"><input type="radio" name="q4" value="Users can apply too many codes at once" /> Users can apply too many codes at once</label>
+            <label class="option"><input type="radio" name="q4" value="Promotion rules are updated too frequently" /> Promotion rules are updated too frequently</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-actions">
+      <div class="hint">This version is intentionally scrollable so participants inspect the ticket, evidence, and processing flow before answering.</div>
+      <button id="submitBtn" class="btn" type="button">Submit Task 2</button>
+    </div>
+  </section>
+</main>
+
+<div class="helper-nav">
+  <a href="#ticket">Ticket</a>
+  <a href="#evidence">Evidence</a>
+  <a href="#questions">Questions</a>
+</div>
+
+<script>
+  const TASK_ID = 'task2';
+  const CONDITION = 'focus';
+  const TOTAL_QUESTIONS = 4;
+  const STORAGE_KEY = 'task2_focus_metrics';
+
+  const taskStart = Date.now();
+  let timeLeft = 210;
+  const timer = document.getElementById('timer');
+  const submitBtn = document.getElementById('submitBtn');
+  const progressChip = document.getElementById('progressChip');
+
+  const metrics = {
+    taskId: TASK_ID,
+    condition: CONDITION,
+    taskStartIso: new Date(taskStart).toISOString(),
+    totalElapsedMs: 0,
+    submittedAtIso: null,
+    scrollCount: 0,
+    scrollDistancePx: 0,
+    backtrackCount: 0,
+    firstAnswerTimeMs: null,
+    answerChangeCount: 0,
+    answersCompleted: 0,
+    currentSection: 'ticket',
+    sectionVisits: {
+      ticket: 1,
+      evidence: 0,
+      questions: 0
+    },
+    sectionDwellMs: {
+      ticket: 0,
+      evidence: 0,
+      questions: 0
+    },
+    selectedAnswers: {
+      q1: null,
+      q2: null,
+      q3: null,
+      q4: null
+    }
+  };
+
+  let currentSection = 'ticket';
+  let sectionEnterTime = Date.now();
+  let previousScrollY = window.scrollY;
+  let ticking = false;
+
+  const radios = Array.from(document.querySelectorAll('input[type="radio"]'));
+  const sections = Array.from(document.querySelectorAll('.track-section'));
+
+  function updateProgress() {
+    const answered = ['q1', 'q2', 'q3', 'q4'].filter(q => metrics.selectedAnswers[q] !== null).length;
+    metrics.answersCompleted = answered;
+    progressChip.textContent = `${answered} / ${TOTAL_QUESTIONS} answered`;
+  }
+
+  function persistMetrics(isFinal = false) {
+    const now = Date.now();
+    const liveDwell = { ...metrics.sectionDwellMs };
+    liveDwell[currentSection] += now - sectionEnterTime;
+
+    const payload = {
+      ...metrics,
+      sectionDwellMs: liveDwell,
+      totalElapsedMs: now - taskStart,
+      totalElapsedSec: Number(((now - taskStart) / 1000).toFixed(2)),
+      firstAnswerTimeSec: metrics.firstAnswerTimeMs === null ? null : Number((metrics.firstAnswerTimeMs / 1000).toFixed(2)),
+      savedAtIso: new Date(now).toISOString(),
+      isFinal
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  }
+
+  function updateCurrentSection(nextSection) {
+    const now = Date.now();
+    metrics.sectionDwellMs[currentSection] += now - sectionEnterTime;
+
+    if (nextSection !== currentSection) {
+      const order = ['ticket', 'evidence', 'questions'];
+      const prevIndex = order.indexOf(currentSection);
+      const nextIndex = order.indexOf(nextSection);
+      if (nextIndex < prevIndex) {
+        metrics.backtrackCount += 1;
+      }
+      metrics.sectionVisits[nextSection] += 1;
+      currentSection = nextSection;
+      metrics.currentSection = nextSection;
+    }
+
+    sectionEnterTime = now;
+    persistMetrics();
+  }
+
+  function getMostVisibleSection() {
+    let best = sections[0];
+    let bestVisible = -1;
+
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const viewTop = Math.max(rect.top, 0);
+      const viewBottom = Math.min(rect.bottom, window.innerHeight);
+      const visible = Math.max(0, viewBottom - viewTop);
+      if (visible > bestVisible) {
+        bestVisible = visible;
+        best = section;
+      }
+    });
+
+    return best.dataset.section;
+  }
+
+  window.addEventListener('scroll', () => {
+    const currentY = window.scrollY;
+    const delta = Math.abs(currentY - previousScrollY);
+
+    if (delta > 0) {
+      metrics.scrollCount += 1;
+      metrics.scrollDistancePx += Math.round(delta);
+      previousScrollY = currentY;
+    }
+
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const visibleSection = getMostVisibleSection();
+        if (visibleSection && visibleSection !== currentSection) {
+          updateCurrentSection(visibleSection);
+        } else {
+          persistMetrics();
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  radios.forEach(radio => {
+    radio.addEventListener('change', (event) => {
+      const qName = event.target.name;
+      const newValue = event.target.value;
+      const previousValue = metrics.selectedAnswers[qName];
+
+      if (metrics.firstAnswerTimeMs === null) {
+        metrics.firstAnswerTimeMs = Date.now() - taskStart;
+      }
+
+      if (previousValue !== null && previousValue !== newValue) {
+        metrics.answerChangeCount += 1;
+      }
+
+      metrics.selectedAnswers[qName] = newValue;
+      updateProgress();
+      persistMetrics();
+    });
+  });
+
+  submitBtn.addEventListener('click', () => {
+    const now = Date.now();
+    metrics.sectionDwellMs[currentSection] += now - sectionEnterTime;
+    sectionEnterTime = now;
+    metrics.totalElapsedMs = now - taskStart;
+    metrics.submittedAtIso = new Date(now).toISOString();
+
+    const payload = {
+      ...metrics,
+      totalElapsedSec: Number((metrics.totalElapsedMs / 1000).toFixed(2)),
+      firstAnswerTimeSec: metrics.firstAnswerTimeMs === null ? null : Number((metrics.firstAnswerTimeMs / 1000).toFixed(2)),
+      isFinal: true
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    window.location.href = "task3.html";
+  });
+
+  updateProgress();
+  persistMetrics();
+
+  const interval = setInterval(() => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timer.textContent = `Time remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    timeLeft -= 1;
+    persistMetrics();
+
+    if (timeLeft < 0) {
+      clearInterval(interval);
+      timer.textContent = 'Time is up';
+    }
+  }, 1000);
+</script>
+</body>
+</html>
