@@ -814,6 +814,17 @@
     });
 
     submitBtn.addEventListener('click', () => {
+      const requiredQuestions = ['q1', 'q2', 'q3', 'q4'];
+
+      const unansweredQuestions = requiredQuestions.filter(q =>
+        !document.querySelector(`input[name="${q}"]:checked`)
+      );
+
+      if (unansweredQuestions.length > 0) {
+        alert("Please answer all questions before continuing.");
+        return;
+      }
+
       const now = Date.now();
       metrics.sectionDwellMs[currentSection] += now - sectionEnterTime;
       sectionEnterTime = now;
