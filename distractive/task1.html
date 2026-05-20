@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task 1 - Distraction Condition UI with Behavioural Metrics</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --panel-soft: #fafcff;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: #d9e1ea;
+      --accent: #1d4f91;
+      --navy: #0f172a;
+      --danger: #b42318;
+      --warning: #b54708;
+      --success: #157347;
+      --purple: #6941c6;
+      --info: #175cd3;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 24px;
+      background: var(--navy);
+      color: white;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .brand .title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .brand .subtitle {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .timer,
+    .progress-chip,
+    .updates-chip {
+      font-size: 14px;
+      font-weight: 700;
+      background: #1e293b;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      white-space: nowrap;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .updates-chip {
+      cursor: pointer;
+    }
+
+    .updates-chip:hover {
+      background: #2a3a52;
+    }
+
+    .updates-panel {
+      position: fixed;
+      top: 66px;
+      right: 24px;
+      z-index: 130;
+      width: min(320px, calc(100vw - 48px));
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.18);
+      display: none;
+      overflow: hidden;
+    }
+
+    .updates-panel.open {
+      display: block;
+      animation: slideIn 0.18s ease-out;
+    }
+
+    .updates-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fcfdff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .updates-list {
+      margin: 0;
+      padding: 6px 14px;
+      list-style: none;
+    }
+
+    .updates-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #edf1f5;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .updates-list li:last-child {
+      border-bottom: none;
+    }
+
+    .update-meta {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .workspace-alert {
+      position: sticky;
+      top: 65px;
+      z-index: 70;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 24px;
+      background: #fff7ed;
+      border-bottom: 1px solid #fed7aa;
+      color: var(--warning);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .workspace-alert span:last-child {
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .layout {
+      width: min(1320px, calc(100% - 32px));
+      margin: 24px auto 40px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .activity-sidebar {
+      position: sticky;
+      top: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .side-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      overflow: hidden;
+    }
+
+    .side-panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fcfdff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .side-panel-title {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .count-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: #fef3f2;
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .side-panel-body {
+      padding: 14px 16px;
+    }
+
+    .activity-item {
+      display: grid;
+      gap: 4px;
+      padding: 10px 0;
+      border-bottom: 1px solid #edf1f5;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-title {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .activity-meta {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .activity-tag {
+      display: inline-flex;
+      width: fit-content;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #eef2f6;
+      color: #475467;
+      margin-top: 2px;
+    }
+
+    .tag-warn { background: #fff7ed; color: var(--warning); }
+    .tag-danger { background: #fef3f2; color: var(--danger); }
+    .tag-info { background: #e8f0fb; color: var(--info); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fcfdff;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .card-subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .card-body {
+      padding: 18px 20px 20px;
+    }
+
+    .priority-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #fef3f2;
+      color: var(--danger);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .ticket-meta {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .meta-box {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-soft);
+    }
+
+    .meta-box.noise-emphasis {
+      border-color: #fed7aa;
+      background: #fffbf5;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .meta-value {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .ticket-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .ticket-block {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 15px 16px;
+      background: #fff;
+    }
+
+    .ticket-block.full {
+      grid-column: 1 / -1;
+    }
+
+    .block-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .block-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .block-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.95fr;
+      gap: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: #fafcff;
+    }
+
+    tr.attention-row td {
+      background: #fffaf3;
+    }
+
+    .metric-chip {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chip-danger { background: #fef3f2; color: var(--danger); }
+    .chip-warn { background: #fff7ed; color: var(--warning); }
+    .chip-ok { background: #ecfdf3; color: var(--success); }
+    .chip-purple { background: #f4f3ff; color: var(--purple); }
+    .chip-blue { background: #e8f0fb; color: var(--info); }
+
+    .side-note {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fbfcfe;
+      margin-bottom: 14px;
+    }
+
+    .side-note.competing-note {
+      border-color: #fed7aa;
+      background: #fffbf5;
+    }
+
+    .side-note h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .side-note p, .side-note li {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .side-note ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .logs {
+      background: #0b1220;
+      color: #dbe7ff;
+      border-radius: 14px;
+      padding: 16px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .log-highlight-soft {
+      color: #fde68a;
+      font-weight: 800;
+    }
+
+    .questions-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .question {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
+    }
+
+    .question-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .question-hint {
+      margin: -4px 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .option:hover {
+      border-color: #b8c8da;
+      background: #fbfdff;
+    }
+
+    .option input {
+      margin-top: 2px;
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 18px 20px 22px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .helper-nav {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .helper-nav a {
+      text-decoration: none;
+      background: var(--navy);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+    }
+
+    .notification-stack {
+      position: fixed;
+      right: 24px;
+      top: 102px;
+      z-index: 120;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(340px, calc(100vw - 48px));
+      pointer-events: none;
+    }
+
+    .notification {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #cfd8e3;
+      border-left: 5px solid var(--accent);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 28px rgba(15,23,42,0.16);
+      pointer-events: auto;
+      animation: slideIn 0.25s ease-out;
+    }
+
+    .notification.visible {
+      display: block;
+    }
+
+    .notification-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .notification-body {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .notif-time {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .notif-close {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      color: var(--muted);
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .activity-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .ticket-meta {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ticket-grid,
+      .split-grid,
+      .activity-sidebar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .workspace-alert {
+        top: 114px;
+        padding: 10px 16px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .layout {
+        width: min(1100px, calc(100% - 18px));
+        margin-top: 16px;
+      }
+
+      .ticket-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-right {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .notification-stack {
+        right: 12px;
+        top: 170px;
+        width: calc(100vw - 24px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="title">Operations Review Workspace</div>
+      <div class="subtitle">Task 1 · L2 Ticket Triage and Initial Diagnosis</div>
+    </div>
+    <div class="topbar-right">
+      <button class="updates-chip" id="updatesToggle" type="button">🔔 6 Updates</button>
+      <div class="progress-chip" id="progressChip">0 / 4 answered</div>
+      <div class="timer" id="timer">Time remaining: 03:30</div>
+    </div>
+  </header>
+
+  <div class="updates-panel" id="updatesPanel" aria-label="Recent updates panel">
+    <div class="updates-header">
+      <span>Recent Updates</span>
+      <span class="count-pill">6</span>
+    </div>
+    <ul class="updates-list">
+      <li>OPS-4721: New comment added<span class="update-meta">Incident channel · just now</span></li>
+      <li>AuthService latency variation detected<span class="update-meta">Monitoring feed · 09:21 AM</span></li>
+      <li>Analytics delivery delay increased<span class="update-meta">Event pipeline · 09:20 AM</span></li>
+      <li>Support logged another checkout complaint<span class="update-meta">Customer Service · 09:22 AM</span></li>
+      <li>Monitoring feed refreshed<span class="update-meta">System update · 09:23 AM</span></li>
+      <li>Cache refresh completed<span class="update-meta">Platform note · 09:20 AM</span></li>
+    </ul>
+  </div>
+
+  <div class="workspace-alert">
+    <span>Workspace update: Multiple monitoring feeds refreshed while this ticket is open.</span>
+    <span>SLA watch active</span>
+  </div>
+
+  <div class="notification-stack" aria-live="polite">
+    <div class="notification" id="notif1">
+      <div class="notification-title">
+        <span>Team Chat</span>
+        <span class="notif-time">now</span>
+        <button class="notif-close" type="button" data-close="notif1">×</button>
+      </div>
+      <div class="notification-body">Finance Ops: Can someone quickly check yesterday’s settlement discrepancy?</div>
+    </div>
+
+    <div class="notification" id="notif2">
+      <div class="notification-title">
+        <span>Calendar Reminder</span>
+        <span class="notif-time">soon</span>
+        <button class="notif-close" type="button" data-close="notif2">×</button>
+      </div>
+      <div class="notification-body">Weekly Ops Sync starts in 10 minutes.</div>
+    </div>
+
+    <div class="notification" id="notif3">
+      <div class="notification-title">
+        <span>System Alert</span>
+        <span class="notif-time">09:21</span>
+        <button class="notif-close" type="button" data-close="notif3">×</button>
+      </div>
+      <div class="notification-body">Monitoring note: AuthService latency variation detected.</div>
+    </div>
+  </div>
+
+  <main class="layout">
+    <div class="page">
+      <section class="card track-section" id="ticket" data-section="ticket">
+        <div class="card-header">
+          <h1 class="card-title">Customer Support Escalation Ticket</h1>
+          <div class="card-subtitle">Review this newly reported issue as the first reviewer. Use the attached evidence to determine the most likely source of the problem and its immediate impact.</div>
+        </div>
+        <div class="card-body">
+          <div class="priority-pill">P1 - Critical · L2 Escalation · Customer Impact Confirmed</div>
+
+          <div class="ticket-meta">
+            <div class="meta-box">
+              <div class="meta-label">Ticket ID</div>
+              <div class="meta-value">OPS-4721</div>
+            </div>
+            <div class="meta-box">
+              <div class="meta-label">Source</div>
+              <div class="meta-value">Customer Service (L2)</div>
+            </div>
+            <div class="meta-box noise-emphasis">
+              <div class="meta-label">Reported Time</div>
+              <div class="meta-value">09:20 AM</div>
+            </div>
+            <div class="meta-box">
+              <div class="meta-label">Affected Area</div>
+              <div class="meta-value">Transaction Submission Flow</div>
+            </div>
+            <div class="meta-box noise-emphasis">
+              <div class="meta-label">Environment</div>
+              <div class="meta-value">Production · Web Application</div>
+            </div>
+          </div>
+
+          <div class="ticket-grid">
+            <div class="ticket-block full">
+              <div class="block-label">Summary</div>
+              <p class="block-text">Multiple users report transaction submission failures shortly after a minor release related to transaction validation.</p>
+            </div>
+
+            <div class="ticket-block full">
+              <div class="block-label">Description</div>
+              <p class="block-text">Customer service has escalated a newly reported critical issue affecting multiple users. Transaction-related actions, including checkout and form submission, are intermittently failing. Pages load normally, but the final submission step either remains pending or times out. Similar complaints have been reported across multiple regions.</p>
+            </div>
+
+            <div class="ticket-block">
+              <div class="block-label">Observed Behaviour</div>
+              <ul class="block-list">
+                <li>Final transaction submission remains pending before timeout</li>
+                <li>Retry activity appears to increase during submission attempts</li>
+                <li>Pages continue to load normally outside the submission step</li>
+              </ul>
+            </div>
+
+            <div class="ticket-block">
+              <div class="block-label">Impact</div>
+              <p class="block-text">Users are unable to reliably complete transaction-related actions such as checkout and form submission.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card track-section" id="evidence" data-section="evidence">
+        <div class="card-header">
+          <h2 class="card-title">Attached Monitoring Evidence</h2>
+          <div class="card-subtitle">The ticket includes service metrics, deployment notes, and support observations. Some signals may be less relevant than others.</div>
+        </div>
+        <div class="card-body">
+          <div class="split-grid">
+            <div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Current Status</th>
+                    <th>Assessment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="attention-row">
+                    <td>Transaction Success Rate</td>
+                    <td>98% → 74%</td>
+                    <td><span class="metric-chip chip-danger">Critical Drop</span></td>
+                  </tr>
+                  <tr class="attention-row">
+                    <td>API Response Time</td>
+                    <td>210ms → 910ms</td>
+                    <td><span class="metric-chip chip-warn">Elevated</span></td>
+                  </tr>
+                  <tr class="attention-row">
+                    <td>Transaction Processor Retries</td>
+                    <td>Increasing rapidly</td>
+                    <td><span class="metric-chip chip-danger">Abnormal</span></td>
+                  </tr>
+                  <tr class="attention-row">
+                    <td>Queued Submission Requests</td>
+                    <td>Above baseline</td>
+                    <td><span class="metric-chip chip-warn">Needs Review</span></td>
+                  </tr>
+                  <tr>
+                    <td>Database Latency</td>
+                    <td>Stable</td>
+                    <td><span class="metric-chip chip-ok">Normal</span></td>
+                  </tr>
+                  <tr>
+                    <td>CPU Usage</td>
+                    <td>Normal</td>
+                    <td><span class="metric-chip chip-blue">Watched</span></td>
+                  </tr>
+                  <tr class="attention-row">
+                    <td>Analytics Event Delay</td>
+                    <td>Increased</td>
+                    <td><span class="metric-chip chip-purple">Secondary</span></td>
+                  </tr>
+                  <tr>
+                    <td>Cache Hit Rate</td>
+                    <td>Stable</td>
+                    <td><span class="metric-chip chip-ok">Normal</span></td>
+                  </tr>
+                  <tr class="attention-row">
+                    <td>Auth Service Latency</td>
+                    <td>Minor spike detected</td>
+                    <td><span class="metric-chip chip-warn">Monitor</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <div class="side-note competing-note">
+                <h3>Deployment Note</h3>
+                <p>09:10 AM deployment completed successfully. Release included a minor update to transaction validation logic. No database schema changes were included. Front-end assets were unchanged in this release.</p>
+              </div>
+
+              <div class="side-note">
+                <h3>Support Summary</h3>
+                <ul>
+                  <li>Issue reproduced by support on checkout flow</li>
+                  <li>Users can still browse and load pages normally</li>
+                  <li>Problem appears during the final transaction submission step</li>
+                </ul>
+              </div>
+
+              <div class="side-note competing-note">
+                <h3>Related Monitoring Notes</h3>
+                <ul>
+                  <li>AuthService latency variation detected during same period</li>
+                  <li>Analytics delivery queue shows delayed event processing</li>
+                  <li>Cache refresh completed at 09:20 AM</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card track-section" id="logs" data-section="logs">
+        <div class="card-header">
+          <h2 class="card-title">Recent System Logs</h2>
+          <div class="card-subtitle">Logs captured from the same time window as the customer reports and metric changes.</div>
+        </div>
+        <div class="card-body">
+          <div class="logs">09:19:58  TransactionProcessor timeout
+09:20:02  Retry triggered
+09:20:04  Transaction request queued
+09:20:05  TransactionProcessor timeout
+09:20:07  Retry triggered
+09:20:09  Transaction request queued
+09:20:12  TransactionProcessor timeout
+09:20:14  Retry triggered
+09:20:18  Request exceeded timeout threshold
+09:20:22  <span class="log-highlight-soft">Analytics event delayed</span>
+09:20:24  <span class="log-highlight-soft">Cache refresh triggered</span>
+09:20:27  <span class="log-highlight-soft">AuthService latency spike detected</span></div>
+        </div>
+      </section>
+
+      <section class="card track-section" id="questions" data-section="questions">
+        <div class="card-header">
+          <h2 class="card-title">Questions</h2>
+          <div class="card-subtitle">Choose the best answer based only on the ticket details shown above.</div>
+        </div>
+        <div class="card-body">
+          <div class="questions-wrap">
+            <div class="question">
+              <p class="question-title">1. Which system area is most likely causing the issue?</p>
+              <p class="question-hint">Choose the option best supported by the combined ticket description, metrics, and logs.</p>
+              <div class="options">
+                <label class="option"><input type="radio" name="q1" value="Database service" /> Database service</label>
+                <label class="option"><input type="radio" name="q1" value="Transaction processing service" /> Transaction processing service</label>
+                <label class="option"><input type="radio" name="q1" value="API gateway layer" /> API gateway layer</label>
+                <label class="option"><input type="radio" name="q1" value="Front-end application layer" /> Front-end application layer</label>
+              </div>
+            </div>
+
+            <div class="question">
+              <p class="question-title">2. Which evidence most clearly points to the issue?</p>
+              <p class="question-hint">Look for the most direct evidence rather than an indirect symptom.</p>
+              <div class="options">
+                <label class="option"><input type="radio" name="q2" value="Increase in API response time" /> Increase in API response time</label>
+                <label class="option"><input type="radio" name="q2" value="Repeated transaction processor timeout logs and retries" /> Repeated transaction processor timeout logs and retries</label>
+                <label class="option"><input type="radio" name="q2" value="Drop in transaction success rate" /> Drop in transaction success rate</label>
+                <label class="option"><input type="radio" name="q2" value="Recent deployment update" /> Recent deployment update</label>
+              </div>
+            </div>
+
+            <div class="question">
+              <p class="question-title">3. Which metric best shows that users are being affected?</p>
+              <p class="question-hint">Focus on the metric that most directly reflects customer impact, not just infrastructure stress.</p>
+              <div class="options">
+                <label class="option"><input type="radio" name="q3" value="API response time increase" /> API response time increase</label>
+                <label class="option"><input type="radio" name="q3" value="Transaction success rate drop" /> Transaction success rate drop</label>
+                <label class="option"><input type="radio" name="q3" value="Retry attempts increasing" /> Retry attempts increasing</label>
+                <label class="option"><input type="radio" name="q3" value="Auth service latency spike" /> Auth service latency spike</label>
+              </div>
+            </div>
+
+            <div class="question">
+              <p class="question-title">4. What are users most likely experiencing because of this issue?</p>
+              <p class="question-hint">Base your answer on the ticket wording and the evidence attached.</p>
+              <div class="options">
+                <label class="option"><input type="radio" name="q4" value="Slow page loading across the site" /> Slow page loading across the site</label>
+                <label class="option"><input type="radio" name="q4" value="Transaction submissions failing or timing out" /> Transaction submissions failing or timing out</label>
+                <label class="option"><input type="radio" name="q4" value="Users unable to log in" /> Users unable to log in</label>
+                <label class="option"><input type="radio" name="q4" value="Slow dashboard refreshes" /> Slow dashboard refreshes</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-actions">
+          <div class="hint">This version is intentionally scrollable so participants scan the ticket, evidence, and logs before answering.</div>
+          <button class="btn" id="submitBtn" type="button">Submit Task 1</button>
+        </div>
+      </section>
+    </div>
+
+    <aside class="activity-sidebar" aria-label="Workspace activity panel">
+      <div class="side-panel track-section" data-section="activity">
+        <div class="side-panel-header">
+          <div class="side-panel-title">Recent Activity</div>
+          <span class="count-pill">5</span>
+        </div>
+        <div class="side-panel-body">
+          <div class="activity-item">
+            <div class="activity-title">OPS-4698 updated</div>
+            <div class="activity-meta">Deployment review comment added by Platform Ops.</div>
+            <span class="activity-tag tag-info">Related</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-title">Monitoring feed refreshed</div>
+            <div class="activity-meta">New latency sample available from AuthService.</div>
+            <span class="activity-tag tag-warn">Latency</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-title">Incident channel active</div>
+            <div class="activity-meta">3 new messages posted in the last minute.</div>
+            <span class="activity-tag tag-danger">Unread</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-title">Cache service note</div>
+            <div class="activity-meta">Refresh completed during the incident window.</div>
+            <span class="activity-tag">Info</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel track-section" data-section="linked">
+        <div class="side-panel-header">
+          <div class="side-panel-title">Linked Items</div>
+          <span class="count-pill">4</span>
+        </div>
+        <div class="side-panel-body">
+          <div class="activity-item">
+            <div class="activity-title">OPS-4630</div>
+            <div class="activity-meta">Previous API response time investigation.</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-title">REL-2143</div>
+            <div class="activity-meta">Validation logic release record.</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-title">MON-9021</div>
+            <div class="activity-meta">Analytics event delay watch item.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel track-section" data-section="watchers">
+        <div class="side-panel-header">
+          <div class="side-panel-title">Watchers</div>
+          <span class="count-pill">7</span>
+        </div>
+        <div class="side-panel-body">
+          <div class="activity-item">
+            <div class="activity-title">Platform Ops</div>
+            <div class="activity-meta">Watching production incidents.</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-title">Support Lead</div>
+            <div class="activity-meta">Waiting for first triage response.</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="helper-nav">
+    <a href="#ticket">Ticket</a>
+    <a href="#evidence">Evidence</a>
+    <a href="#logs">Logs</a>
+    <a href="#questions">Questions</a>
+  </div>
+
+  <script>
+    const TASK_ID = 'task1';
+    const CONDITION = 'distraction';
+    const TOTAL_QUESTIONS = 4;
+    const STORAGE_KEY = 'task1_distraction_metrics';
+
+    const taskStart = Date.now();
+    let timeLeft = 210;
+    const timer = document.getElementById('timer');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressChip = document.getElementById('progressChip');
+
+    const metrics = {
+      taskId: TASK_ID,
+      condition: CONDITION,
+      taskStartIso: new Date(taskStart).toISOString(),
+      totalElapsedMs: 0,
+      submittedAtIso: null,
+      scrollCount: 0,
+      scrollDistancePx: 0,
+      backtrackCount: 0,
+      firstAnswerTimeMs: null,
+      answerChangeCount: 0,
+      answersCompleted: 0,
+      notificationShownCount: 0,
+      notificationDismissCount: 0,
+      updatesPanelOpenCount: 0,
+      currentSection: 'ticket',
+      sectionVisits: {
+        ticket: 1,
+        evidence: 0,
+        logs: 0,
+        questions: 0,
+        activity: 0,
+        linked: 0,
+        watchers: 0
+      },
+      sectionDwellMs: {
+        ticket: 0,
+        evidence: 0,
+        logs: 0,
+        questions: 0,
+        activity: 0,
+        linked: 0,
+        watchers: 0
+      },
+      selectedAnswers: {
+        q1: null,
+        q2: null,
+        q3: null,
+        q4: null
+      }
+    };
+
+    let currentSection = 'ticket';
+    let sectionEnterTime = Date.now();
+    let previousScrollY = window.scrollY;
+    let ticking = false;
+
+    const radios = Array.from(document.querySelectorAll('input[type="radio"]'));
+    const sections = Array.from(document.querySelectorAll('.track-section'));
+    const notificationIds = ['notif1', 'notif2', 'notif3'];
+    const updatesToggle = document.getElementById('updatesToggle');
+    const updatesPanel = document.getElementById('updatesPanel');
+
+    function updateProgress() {
+      const answered = ['q1', 'q2', 'q3', 'q4'].filter(q => metrics.selectedAnswers[q] !== null).length;
+      metrics.answersCompleted = answered;
+      progressChip.textContent = `${answered} / ${TOTAL_QUESTIONS} answered`;
+    }
+
+    function persistMetrics(isFinal = false) {
+      const now = Date.now();
+      const liveDwell = { ...metrics.sectionDwellMs };
+      liveDwell[currentSection] += now - sectionEnterTime;
+
+      const payload = {
+        ...metrics,
+        sectionDwellMs: liveDwell,
+        totalElapsedMs: now - taskStart,
+        totalElapsedSec: Number(((now - taskStart) / 1000).toFixed(2)),
+        firstAnswerTimeSec: metrics.firstAnswerTimeMs === null ? null : Number((metrics.firstAnswerTimeMs / 1000).toFixed(2)),
+        savedAtIso: new Date(now).toISOString(),
+        isFinal
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    }
+
+    function updateCurrentSection(nextSection) {
+      const now = Date.now();
+      metrics.sectionDwellMs[currentSection] += now - sectionEnterTime;
+
+      if (nextSection !== currentSection) {
+        const order = ['ticket', 'evidence', 'logs', 'questions'];
+        const prevIndex = order.indexOf(currentSection);
+        const nextIndex = order.indexOf(nextSection);
+        if (prevIndex !== -1 && nextIndex !== -1 && nextIndex < prevIndex) {
+          metrics.backtrackCount += 1;
+        }
+        metrics.sectionVisits[nextSection] += 1;
+        currentSection = nextSection;
+        metrics.currentSection = nextSection;
+      }
+
+      sectionEnterTime = now;
+      persistMetrics();
+    }
+
+    function getMostVisibleSection() {
+      let best = sections[0];
+      let bestVisible = -1;
+
+      sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const viewTop = Math.max(rect.top, 0);
+        const viewBottom = Math.min(rect.bottom, window.innerHeight);
+        const visible = Math.max(0, viewBottom - viewTop);
+        if (visible > bestVisible) {
+          bestVisible = visible;
+          best = section;
+        }
+      });
+
+      return best.dataset.section;
+    }
+
+    function showNotification(id) {
+      const notification = document.getElementById(id);
+      if (!notification || notification.classList.contains('visible')) return;
+      notification.classList.add('visible');
+      metrics.notificationShownCount += 1;
+      persistMetrics();
+    }
+
+    function hideNotification(id) {
+      const notification = document.getElementById(id);
+      if (!notification || !notification.classList.contains('visible')) return;
+      notification.classList.remove('visible');
+      metrics.notificationDismissCount += 1;
+      persistMetrics();
+    }
+
+    window.addEventListener('scroll', () => {
+      const currentY = window.scrollY;
+      const delta = Math.abs(currentY - previousScrollY);
+
+      if (delta > 0) {
+        metrics.scrollCount += 1;
+        metrics.scrollDistancePx += Math.round(delta);
+        previousScrollY = currentY;
+      }
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const visibleSection = getMostVisibleSection();
+          if (visibleSection && visibleSection !== currentSection) {
+            updateCurrentSection(visibleSection);
+          } else {
+            persistMetrics();
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', (event) => {
+        const qName = event.target.name;
+        const newValue = event.target.value;
+        const previousValue = metrics.selectedAnswers[qName];
+
+        if (metrics.firstAnswerTimeMs === null) {
+          metrics.firstAnswerTimeMs = Date.now() - taskStart;
+        }
+
+        if (previousValue !== null && previousValue !== newValue) {
+          metrics.answerChangeCount += 1;
+        }
+
+        metrics.selectedAnswers[qName] = newValue;
+        updateProgress();
+        persistMetrics();
+      });
+    });
+
+    document.querySelectorAll('.notif-close').forEach(button => {
+      button.addEventListener('click', (event) => {
+        hideNotification(event.target.dataset.close);
+      });
+    });
+
+    updatesToggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const isOpen = updatesPanel.classList.toggle('open');
+      if (isOpen) {
+        metrics.updatesPanelOpenCount += 1;
+      }
+      persistMetrics();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!updatesPanel.contains(event.target) && event.target !== updatesToggle) {
+        updatesPanel.classList.remove('open');
+      }
+    });
+
+    submitBtn.addEventListener('click', () => {
+      const now = Date.now();
+      metrics.sectionDwellMs[currentSection] += now - sectionEnterTime;
+      sectionEnterTime = now;
+      metrics.totalElapsedMs = now - taskStart;
+      metrics.submittedAtIso = new Date(now).toISOString();
+
+      const payload = {
+        ...metrics,
+        totalElapsedSec: Number((metrics.totalElapsedMs / 1000).toFixed(2)),
+        firstAnswerTimeSec: metrics.firstAnswerTimeMs === null ? null : Number((metrics.firstAnswerTimeMs / 1000).toFixed(2)),
+        isFinal: true
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      window.location.href = "task2.html";
+    });
+
+    updateProgress();
+    persistMetrics();
+
+    setTimeout(() => showNotification(notificationIds[0]), 18000);
+    setTimeout(() => showNotification(notificationIds[1]), 52000);
+    setTimeout(() => showNotification(notificationIds[2]), 92000);
+
+    const interval = setInterval(() => {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timer.textContent = `Time remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      timeLeft -= 1;
+      persistMetrics();
+
+      if (timeLeft < 0) {
+        clearInterval(interval);
+        timer.textContent = 'Time is up';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
