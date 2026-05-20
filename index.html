@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Designing for Attention in Digital Workspaces</title>
+
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #667085;
+      --accent: #1d4f91;
+      --accent-dark: #0f172a;
+      --lavender: #f4f0ff;
+      --lavender-border: #ddd6fe;
+      --lavender-text: #4c1d95;
+      --line: #d9e1ea;
+      --soft-blue: #eef4fb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, #e8f0fb 0, transparent 34%),
+        radial-gradient(circle at bottom right, #f4f0ff 0, transparent 32%),
+        var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 980px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      box-shadow: 0 20px 46px rgba(15, 23, 42, 0.10);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 42px 46px 36px;
+      background: linear-gradient(135deg, #0f172a, #1d4f91);
+      color: white;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #e8f0fb;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      letter-spacing: 0.01em;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 800px;
+      font-size: 42px;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      font-weight: 780;
+    }
+
+    .subtitle {
+      margin: 16px 0 0;
+      max-width: 790px;
+      color: #dbe7ff;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .content {
+      padding: 36px 46px 42px;
+    }
+
+    .warm-note {
+      padding: 20px 22px;
+      background: var(--lavender);
+      border: 1px solid var(--lavender-border);
+      border-radius: 20px;
+      color: var(--lavender-text);
+      font-size: 15px;
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 19px;
+      color: var(--text);
+    }
+
+    .body-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .info-box {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 20px 22px;
+      margin-bottom: 24px;
+    }
+
+    .info-box ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 24px 0 28px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      background: #fafcff;
+    }
+
+    .card-number {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--soft-blue);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      border: 1px solid #d9e6f7;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .consent {
+      border: 1px solid var(--line);
+      background: #fcfdff;
+      border-radius: 20px;
+      padding: 18px 20px;
+      margin-top: 24px;
+    }
+
+    .consent label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .consent input {
+      margin-top: 5px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .start-note {
+      max-width: 500px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 16px;
+      padding: 15px 26px;
+      background: var(--accent);
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(29, 79, 145, 0.24);
+      transition: 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(29, 79, 145, 0.28);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        align-items: flex-start;
+      }
+
+      .hero,
+      .content {
+        padding: 30px 24px;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      .subtitle {
+        font-size: 15px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        align-items: stretch;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="wrapper">
+
+    <section class="hero">
+      <div class="eyebrow">MBAn Research Study</div>
+
+      <h1>Designing for Attention in Digital Workspaces</h1>
+
+      <p class="subtitle">
+        A short research study on how interface design affects focus, distraction,
+        and task performance during realistic workplace investigation tasks.
+      </p>
+    </section>
+
+    <section class="content">
+
+      <div class="warm-note">
+        Thank you for taking a few minutes to support my research. Your participation
+        helps me understand how people work through information-heavy digital tasks,
+        and how better interface design may support attention and flow.
+      </div>
+
+      <div class="info-box">
+        <h2 class="section-title">What you will do</h2>
+
+        <p class="body-text">
+          You will complete three short investigation tasks in a simulated digital
+          operations workspace. After the tasks, you will answer a short questionnaire
+          about your experience.
+        </p>
+
+        <ul>
+          <li>Read the information shown in each task carefully.</li>
+          <li>Answer the task questions based only on what is shown on screen.</li>
+          <li>Complete the final questionnaire after Task 3.</li>
+        </ul>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-number">01</div>
+          <strong>Focus and attention</strong>
+          <span>
+            The study explores how interface design may support or disrupt sustained attention.
+          </span>
+        </div>
+
+        <div class="card">
+          <div class="card-number">02</div>
+          <strong>3 realistic tasks</strong>
+          <span>
+            You will work through ticket, promotion, and dashboard investigation scenarios.
+          </span>
+        </div>
+
+        <div class="card">
+          <div class="card-number">03</div>
+          <strong>About 15 minutes</strong>
+          <span>
+            Please complete the full study in one sitting without refreshing the browser.
+          </span>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <h2 class="section-title">Data collected</h2>
+
+        <p class="body-text">
+          The study records your task answers, timing, scrolling, navigation, and
+          interaction behaviour. This data will be used only for academic analysis.
+        </p>
+      </div>
+
+      <div class="consent">
+        <label>
+          <input type="checkbox" id="consentCheckbox" />
+          <span>
+            I agree to participate in this study and understand that my task responses,
+            timing, scrolling, navigation, and interaction data will be collected for
+            academic research purposes.
+          </span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <div class="start-note">
+          When you click Start Study, you will be randomly assigned to one version of
+          the workspace and taken to Task 1.
+        </div>
+
+        <button class="btn" id="startBtn" disabled>
+          Start Study
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    const consentCheckbox = document.getElementById("consentCheckbox");
+    const startBtn = document.getElementById("startBtn");
+
+    consentCheckbox.addEventListener("change", () => {
+      startBtn.disabled = !consentCheckbox.checked;
+    });
+
+    startBtn.addEventListener("click", () => {
+      localStorage.clear();
+
+      const participantId =
+        "P-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+
+      const condition = Math.random() < 0.5 ? "focus" : "distractive";
+
+      localStorage.setItem("participant_id", participantId);
+      localStorage.setItem("condition", condition);
+      localStorage.setItem("experiment_started_at", new Date().toISOString());
+
+      if (condition === "focus") {
+        window.location.href = "focus/task1.html";
+      } else {
+        window.location.href = "distractive/task1.html";
+      }
+    });
+  </script>
+
+</body>
+</html>
