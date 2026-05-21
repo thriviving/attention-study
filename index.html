@@ -5,24 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Designing for Attention in Digital Workspaces</title>
 
-  <style>
+   <style>
     :root {
       --bg: #f6f8fb;
-      --card: #ffffff;
       --text: #1f2937;
       --muted: #667085;
       --accent: #1d4f91;
-      --accent-dark: #0f172a;
       --lavender: #f4f0ff;
       --lavender-border: #ddd6fe;
       --lavender-text: #4c1d95;
       --line: #d9e1ea;
-      --soft-blue: #eef4fb;
+      --soft-green: #ecfdf3;
+      --green-text: #166534;
+      --green-border: #bbf7d0;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -41,8 +39,8 @@
 
     .wrapper {
       width: 100%;
-      max-width: 980px;
-      background: rgba(255, 255, 255, 0.95);
+      max-width: 1000px;
+      background: rgba(255, 255, 255, 0.96);
       border: 1px solid var(--line);
       border-radius: 30px;
       box-shadow: 0 20px 46px rgba(15, 23, 42, 0.10);
@@ -63,23 +61,22 @@
       color: #e8f0fb;
       font-size: 13px;
       font-weight: 600;
-      font-family: inherit;
       letter-spacing: 0.01em;
       margin-bottom: 18px;
     }
 
     h1 {
       margin: 0;
-      max-width: 800px;
-      font-size: 42px;
-      line-height: 1.15;
+      max-width: 820px;
+      font-size: 40px;
+      line-height: 1.16;
       letter-spacing: -0.015em;
-      font-weight: 780;
+      font-weight: 760;
     }
 
     .subtitle {
       margin: 16px 0 0;
-      max-width: 790px;
+      max-width: 800px;
       color: #dbe7ff;
       font-size: 17px;
       line-height: 1.8;
@@ -97,7 +94,51 @@
       color: var(--lavender-text);
       font-size: 15px;
       line-height: 1.8;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+    }
+
+    .expect-box {
+      border: 1px solid var(--green-border);
+      background: var(--soft-green);
+      color: var(--green-text);
+      border-radius: 22px;
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+
+    .expect-box h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+      font-weight: 760;
+    }
+
+    .expect-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .expect-item {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(187, 247, 208, 0.9);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .expect-label {
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      opacity: 0.85;
+    }
+
+    .expect-value {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.5;
     }
 
     .section-title {
@@ -121,56 +162,41 @@
       margin-bottom: 24px;
     }
 
-    .info-box ul {
-      margin: 12px 0 0;
-      padding-left: 20px;
+    /* Modern Styled Step List */
+    .step-list {
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .step-list li {
+      position: relative;
+      padding-left: 36px;
+      margin-bottom: 12px;
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.8;
+      font-size: 15px;
+      line-height: 1.7;
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin: 24px 0 28px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 20px;
-      background: #fafcff;
-    }
-
-    .card-number {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: var(--soft-blue);
-      color: var(--accent);
+    .step-list li::before {
+      content: counter(step-counter);
+      counter-increment: step-counter;
+      position: absolute;
+      left: 0;
+      top: 2px;
+      width: 22px;
+      height: 22px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
-      font-weight: 800;
-      margin-bottom: 14px;
-      border: 1px solid #d9e6f7;
+      font-size: 11px;
+      font-weight: 700;
     }
-
-    .card strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 15px;
-      color: var(--text);
-    }
-
-    .card span {
-      display: block;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.65;
-    }
+    
+    .step-list { counter-reset: step-counter; }
 
     .consent {
       border: 1px solid var(--line);
@@ -196,17 +222,18 @@
       height: 16px;
     }
 
+    /* Better stacked alignment for actions block */
     .actions {
       margin-top: 30px;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      gap: 18px;
-      flex-wrap: wrap;
+      text-align: center;
+      gap: 16px;
     }
 
     .start-note {
-      max-width: 500px;
+      max-width: 600px;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.7;
@@ -215,14 +242,16 @@
     .btn {
       border: none;
       border-radius: 16px;
-      padding: 15px 26px;
+      padding: 16px 40px;
       background: var(--accent);
       color: white;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 800;
       cursor: pointer;
       box-shadow: 0 10px 22px rgba(29, 79, 145, 0.24);
       transition: 0.18s ease;
+      width: auto;
+      min-width: 200px;
     }
 
     .btn:hover {
@@ -231,7 +260,7 @@
     }
 
     .btn:disabled {
-      opacity: 0.45;
+      opacity: 0.35;
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
@@ -255,19 +284,15 @@
         font-size: 15px;
       }
 
-      .cards {
+      .expect-grid {
         grid-template-columns: 1fr;
-      }
-
-      .actions {
-        align-items: stretch;
       }
 
       .btn {
         width: 100%;
       }
     }
-  </style>
+   </style>
 </head>
 
 <body>
@@ -276,11 +301,9 @@
 
     <section class="hero">
       <div class="eyebrow">MBAn Research Study</div>
-
       <h1>Designing for Attention in Digital Workspaces</h1>
-
       <p class="subtitle">
-        A short research study on how interface design affects focus, distraction,
+        A short research study on how interface design affects focus, distraction, 
         and task performance during realistic workplace investigation tasks.
       </p>
     </section>
@@ -288,82 +311,79 @@
     <section class="content">
 
       <div class="warm-note">
-        Thank you for taking a few minutes to support my research. Your participation
-        helps me understand how people work through information-heavy digital tasks,
+        Thank you for taking a few minutes to support my research. Your participation 
+        helps me understand how people work through information-heavy digital tasks, 
         and how better interface design may support attention and flow.
       </div>
 
-      <div class="info-box">
-        <h2 class="section-title">What you will do</h2>
-
-        <p class="body-text">
-          You will complete three short investigation tasks in a simulated digital
-          operations workspace. After the tasks, you will answer a short questionnaire
-          about your experience.
+      <!-- Merged and condensed instructions block -->
+      <div class="expect-box">
+        <h2>Study Timeline & Requirements</h2>
+        <p class="body-text" style="color: var(--green-text); font-weight: 500;">
+          Please complete the entire study in a single sitting without refreshing or closing your browser. 
+          Answer based strictly on the information shown on your screen.
         </p>
 
-        <ul>
-          <li>Read the information shown in each task carefully.</li>
-          <li>Answer the task questions based only on what is shown on screen.</li>
-          <li>Complete the final questionnaire after Task 3.</li>
-        </ul>
+        <div class="expect-grid">
+          <div class="expect-item">
+            <div class="expect-label">Step 1</div>
+            <div class="expect-value">3 Investigation Tasks</div>
+          </div>
+
+          <div class="expect-item">
+            <div class="expect-label">Time Limit</div>
+            <div class="expect-value">3m 30s per task</div>
+          </div>
+
+          <div class="expect-item">
+            <div class="expect-label">Step 2</div>
+            <div class="expect-value">1 Brief Questionnaire</div>
+          </div>
+        </div>
       </div>
 
-      <div class="cards">
-        <div class="card">
-          <div class="card-number">01</div>
-          <strong>Focus and attention</strong>
-          <span>
-            The study explores how interface design may support or disrupt sustained attention.
-          </span>
-        </div>
+      <!-- Action-oriented clear instructions layout -->
+      <div class="info-box">
+        <h2 class="section-title">Your Task Instructions</h2>
+        <p class="body-text">
+          You will navigate a simulated digital operations workspace and complete short investigation tasks. 
+          Please ensure you follow these rules:
+        </p>
 
-        <div class="card">
-          <div class="card-number">02</div>
-          <strong>3 realistic tasks</strong>
-          <span>
-            You will work through ticket, promotion, and dashboard investigation scenarios.
-          </span>
-        </div>
-
-        <div class="card">
-          <div class="card-number">03</div>
-          <strong>About 15 minutes</strong>
-          <span>
-            Please complete the full study in one sitting without refreshing the browser.
-          </span>
-        </div>
+        <ol class="step-list">
+          <li>Review the data presented in each scenario thoroughly.</li>
+          <li>Submit answers to all questions on the screen before moving to the next task.</li>
+          <li>Complete the final experience survey immediately following Task 3.</li>
+        </ol>
       </div>
 
       <div class="info-box">
-        <h2 class="section-title">Data collected</h2>
-
+        <h2 class="section-title">Data Privacy & Research Use</h2>
         <p class="body-text">
-          The study records your task answers, timing, scrolling, navigation, and
-          interaction behaviour. This data will be used only for academic analysis.
+          To assess behavioral interface changes, this application logs task answers, response timing, scrolling speed, page navigation, and interaction patterns. All data remains anonymous and is utilized exclusively for academic research analysis.
         </p>
       </div>
 
+      <!-- Consent Call to Action -->
       <div class="consent">
         <label>
           <input type="checkbox" id="consentCheckbox" />
           <span>
-            I agree to participate in this study and understand that my task responses,
-            timing, scrolling, navigation, and interaction data will be collected for
+            <strong>I consent to participate:</strong> I understand my task responses, 
+            timing, scrolling, navigation, and interaction data will be anonymously collected for 
             academic research purposes.
           </span>
         </label>
       </div>
 
+      <!-- Re-centered and prioritized primary button actions -->
       <div class="actions">
-        <div class="start-note">
-          When you click Start Study, you will be randomly assigned to one version of
-          the workspace and taken to Task 1.
-        </div>
-
         <button class="btn" id="startBtn" disabled>
           Start Study
         </button>
+        <div class="start-note">
+          Clicking "Start Study" will randomly allocate your session to an interface test group and route you directly to Task 1.
+        </div>
       </div>
 
     </section>
